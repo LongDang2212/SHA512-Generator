@@ -6,7 +6,6 @@
 '''
 
 
-
 # Constant words
 K = [0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc, 0x3956c25bf348b538,
      0x59f111f1b605d019, 0x923f82a4af194f9b, 0xab1c5ed5da6d8118, 0xd807aa98a3030242, 0x12835b0145706fbe,
@@ -49,7 +48,8 @@ class SHA512(object):
             self._handle(message[i * 1024:i * 1024 + 1024])
 
     def _handle(self, data):
-        rotr = lambda x, n: (x >> n) | (x << (64 - n))
+        def rotr(x, n): return (x >> n) | (x << (64 - n))
+        # Word expansion
         w = []
         for j in range(len(data) // 64):
             w.append(int(data[j * 64:j * 64 + 64], 2))
@@ -57,6 +57,8 @@ class SHA512(object):
             s0 = rotr(w[i - 15], 1) ^ rotr(w[i - 15], 8) ^ (w[i - 15] >> 7)
             s1 = rotr(w[i - 2], 19) ^ rotr(w[i - 2], 61) ^ (w[i - 2] >> 6)
             w.append((w[i - 16] + s0 + w[i - 7] + s1) & 0xffffffffffffffff)
+
+        # CompressionFunc
         a = self._h0
         b = self._h1
         c = self._h2
